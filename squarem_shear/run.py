@@ -72,6 +72,12 @@ def run_chunk(conf, chunk, nobj, verbose=True):
         out['gal_flux'][i] = grec['flux']
         out['gal_hlr'][i] = grec['hlr']
 
+        if i == 0:
+            # compile every numba kernel before anything is timed, so the
+            # first object's wall time is not inflated by compilation
+            for arm in arms:
+                measure(conf, arm, images[0]['obs'], seed)
+
         for arm in arms:
             n = arm['name']
             for j, im in enumerate(images):

@@ -38,7 +38,7 @@ PSF sources are in `squarem_shear/psfs.py`. The paper uses three:
 
 | source | config | data |
 |---|---|---|
-| SuperBIT PSFEx models (50 exposures × 20 positions each) | `superbit.yaml` | `.psf` files in `data/psfs/superbit/` |
+| SuperBIT PSFEx models (50 exposures × 20 positions each) | `superbit.yaml` | in the repo, `psf_data/emp_psfs_best/psfex-output/` |
 | HST/ACS F814W PSFs shipped with the COSMOS sample (1000) | `hst.yaml` | COSMOS download |
 | Roman H158 design PSFs at random SCA positions (1000) | `roman.yaml` | none (built into GalSim) |
 
@@ -65,7 +65,6 @@ with `ngmix>=X.Y`.
 
 ```bash
 scripts/download_data.sh            # COSMOS 25.2 training sample (~4 GB)
-mkdir -p data/psfs/superbit && cp /path/to/superbit/*.psf data/psfs/superbit/
 ```
 
 ## Run

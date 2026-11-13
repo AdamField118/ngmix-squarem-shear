@@ -3,7 +3,7 @@
 seed: 4000
 psf:
   source: superbit
-  files: data/psfs/superbit/*.psf
+  files: psf_data/emp_psfs_best/psfex-output/*.psf
   native_pixel_scale: 0.141   # arcsec/pixel; check against the PSFEx headers
   npool: 1000                 # 20 positions per file
 galaxies:
