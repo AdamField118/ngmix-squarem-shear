@@ -133,5 +133,7 @@ scripts/         SLURM array, run_all / collect_all, data download
 tests/           smoke test
 ```
 
-`guessers.py` provides starting mixtures for more than five gaussians.
-ngmix's `GMixPSFGuesser` stops at five.
+`guessers.py` provides the starting mixtures for every PSF fit. They are
+defined in pixel units. ngmix's `GMixPSFGuesser` moves component centres by
+up to 0.1 *arcsec*, which is wider than an HST PSF on 0.03″ pixels, so every
+fit started from it failed. Its tables also stop at five gaussians.

@@ -1,0 +1,173 @@
+{
+ "ngal": 0,
+ "nfail": 50,
+ "arms": {
+  "em5_converged": {
+   "m": NaN,
+   "m_err": NaN,
+   "c1": NaN,
+   "c1_err": NaN,
+   "c2": NaN,
+   "c2_err": NaN,
+   "R11": NaN,
+   "R11_err": NaN,
+   "R22": NaN,
+   "R22_err": NaN,
+   "alpha": NaN,
+   "alpha_err": NaN
+  },
+  "em5_default": {
+   "m": NaN,
+   "m_err": NaN,
+   "dm": NaN,
+   "dm_err": NaN,
+   "c1": NaN,
+   "c1_err": NaN,
+   "dc1": NaN,
+   "dc1_err": NaN,
+   "c2": NaN,
+   "c2_err": NaN,
+   "dc2": NaN,
+   "dc2_err": NaN,
+   "R11": NaN,
+   "R11_err": NaN,
+   "dR11": NaN,
+   "dR11_err": NaN,
+   "R22": NaN,
+   "R22_err": NaN,
+   "dR22": NaN,
+   "dR22_err": NaN,
+   "alpha": NaN,
+   "alpha_err": NaN,
+   "dalpha": NaN,
+   "dalpha_err": NaN
+  },
+  "em5_squarem": {
+   "m": NaN,
+   "m_err": NaN,
+   "dm": NaN,
+   "dm_err": NaN,
+   "c1": NaN,
+   "c1_err": NaN,
+   "dc1": NaN,
+   "dc1_err": NaN,
+   "c2": NaN,
+   "c2_err": NaN,
+   "dc2": NaN,
+   "dc2_err": NaN,
+   "R11": NaN,
+   "R11_err": NaN,
+   "dR11": NaN,
+   "dR11_err": NaN,
+   "R22": NaN,
+   "R22_err": NaN,
+   "dR22": NaN,
+   "dR22_err": NaN,
+   "alpha": NaN,
+   "alpha_err": NaN,
+   "dalpha": NaN,
+   "dalpha_err": NaN
+  },
+  "em5_superbit": {
+   "m": NaN,
+   "m_err": NaN,
+   "dm": NaN,
+   "dm_err": NaN,
+   "c1": NaN,
+   "c1_err": NaN,
+   "dc1": NaN,
+   "dc1_err": NaN,
+   "c2": NaN,
+   "c2_err": NaN,
+   "dc2": NaN,
+   "dc2_err": NaN,
+   "R11": NaN,
+   "R11_err": NaN,
+   "dR11": NaN,
+   "dR11_err": NaN,
+   "R22": NaN,
+   "R22_err": NaN,
+   "dR22": NaN,
+   "dR22_err": NaN,
+   "alpha": NaN,
+   "alpha_err": NaN,
+   "dalpha": NaN,
+   "dalpha_err": NaN
+  }
+ },
+ "nredraw": 0,
+ "s2n_quantiles": {
+  "0.05": NaN,
+  "0.25": NaN,
+  "0.5": NaN,
+  "0.75": NaN,
+  "0.95": NaN
+ },
+ "config": {
+  "arms": [
+   {
+    "em": {
+     "accelerate": true,
+     "maxiter": 50000,
+     "tol": 1e-10
+    },
+    "name": "em5_converged",
+    "ngauss": 5
+   },
+   {
+    "em": {
+     "maxiter": 500,
+     "tol": 1e-05
+    },
+    "name": "em5_default",
+    "ngauss": 5
+   },
+   {
+    "em": {
+     "maxiter": 50000,
+     "tol": 1e-06
+    },
+    "name": "em5_superbit",
+    "ngauss": 5
+   },
+   {
+    "em": {
+     "accelerate": true,
+     "maxiter": 50000,
+     "tol": 1e-06
+    },
+    "name": "em5_squarem",
+    "ngauss": 5
+   }
+  ],
+  "galaxies": {
+   "flux_scale": 2000.0,
+   "sample": "25.2",
+   "source": "cosmos"
+  },
+  "image": {
+   "max_fft_size": 4096,
+   "noise_sigma": 3.0,
+   "pixel_scale": 0.03,
+   "stamp_size": 96
+  },
+  "metacal": {
+   "gal_model": "gauss",
+   "ntry": 20,
+   "psf": "dilate",
+   "step": 0.01
+  },
+  "psf": {
+   "npool": 1000,
+   "sample": "25.2",
+   "source": "cosmos"
+  },
+  "seed": 5000,
+  "selection": {
+   "min_true_flux": 0.0
+  },
+  "shear": {
+   "g": 0.02
+  }
+ }
+}
