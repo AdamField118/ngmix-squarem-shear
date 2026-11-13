@@ -109,6 +109,15 @@ def main():
     with open(args.config) as f:
         conf = yaml.safe_load(f)
 
+    # numpy seeds must be below 2**32, and objects must not overlap
+    # between chunks; both are checked here rather than mid-run
+    base = conf.get('seed', 1234)
+    last = base + 1_000_000 * args.chunk + args.nobj - 1
+    if args.chunk < 0 or args.nobj > 1_000_000 or last >= 2**32:
+        p.error('--chunk must be in 0..%d and --nobj at most 1000000 '
+                '(seeds are seed + 1000000*chunk + i < 2**32)'
+                % ((2**32 - 1 - base - args.nobj) // 1_000_000))
+
     out = run_chunk(conf, args.chunk, args.nobj)
     out['config'] = np.array(yaml.safe_dump(conf))
 
