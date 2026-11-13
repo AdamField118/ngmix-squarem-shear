@@ -46,8 +46,12 @@ class GalaxySource(object):
             index, gal_type='parametric', chromatic=False,
         )
         gal = gal.withFlux(gal.flux * self.gconf.get('flux_scale', 1.0))
+        # the size is read from the catalog: gal.calculateHLR() would draw
+        # the unconvolved profile, which for an n~6 Sersic needs an FFT of
+        # 10^4-10^5 on a side and kills the job
+        rec = self.cat.getParametricRecord(index)
         return gal, {'index': index, 'flux': gal.flux,
-                     'hlr': _hlr(gal)}
+                     'hlr': float(rec['hlr'][0])}
 
     def _analytic(self, rng):
         g = self.gconf
@@ -62,10 +66,3 @@ class GalaxySource(object):
         gal = galsim.Exponential(half_light_radius=hlr, flux=flux)
         gal = gal.shear(g1=e1, g2=e2)
         return gal, {'index': -1, 'flux': flux, 'hlr': hlr}
-
-
-def _hlr(gal):
-    try:
-        return gal.calculateHLR()
-    except Exception:  # pragma: no cover
-        return np.nan
