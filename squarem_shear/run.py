@@ -16,7 +16,8 @@ import yaml
 
 from .psfs import build_pool
 from .galaxies import GalaxySource
-from .sim import make_images, psf_moments, ROT_ANGLES, SHEAR_SIGNS
+from .sim import (make_images, psf_moments, drawable, ROT_ANGLES,
+                  SHEAR_SIGNS)
 from .measure import measure
 
 NIMAGE = len(ROT_ANGLES) * len(SHEAR_SIGNS)
@@ -40,6 +41,8 @@ def run_chunk(conf, chunk, nobj, verbose=True):
         'gal_index': np.zeros(nobj, dtype='i8'),
         'gal_flux': np.zeros(nobj),
         'gal_hlr': np.zeros(nobj),
+        # galaxies redrawn because their FFT would have been too large
+        'gal_nredraw': np.zeros(nobj, dtype='i4'),
         'sign': np.array([im_sign for _, im_sign in _layout()]),
         'rot': np.array([im_rot for im_rot, _ in _layout()]),
     }
@@ -59,8 +62,15 @@ def run_chunk(conf, chunk, nobj, verbose=True):
         seed = base_seed + 1_000_000 * chunk + i
         rng = np.random.RandomState(seed)
         ipsf = rng.randint(len(pool))
-        gal, grec = galsrc.draw(rng)
+        for nredraw in range(1000):
+            gal, grec = galsrc.draw(rng)
+            if drawable(conf, gal, pool[ipsf]):
+                break
+        else:
+            raise RuntimeError('no drawable galaxy in 1000 tries; raise '
+                               'image.max_fft_size')
         images = make_images(conf, gal, pool[ipsf], rng)
+        out['gal_nredraw'][i] = nredraw
 
         out['seed'][i] = seed
         out['psf_index'][i] = ipsf

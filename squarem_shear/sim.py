@@ -14,6 +14,42 @@ import ngmix
 
 ROT_ANGLES = (0.0, 90.0)
 SHEAR_SIGNS = (+1, -1)
+DEFAULT_MAX_FFT = 4096
+
+
+def fft_size(obj, scale, stamp_size):
+    """
+    the k-space image size GalSim's drawFFT would use to draw obj on a
+    stamp_size stamp with pixel scale `scale` (galsim.GSObject.
+    drawFFT_makeKImage).  GalSim only warns when this exceeds
+    gsparams.maximum_fft_size and then tries anyway, which for very
+    extended COSMOS Sersic profiles means a 10^4-10^5 square FFT and an
+    out-of-memory kill.
+    """
+    N = max(obj.getGoodImageSize(scale), stamp_size)
+    N = galsim.Image.good_fft_size(N)
+    N = max(N, obj.gsparams.minimum_fft_size)
+    dk = 2.0 * np.pi / (N * scale)
+    if N * dk / 2 > obj.maxk:
+        return N
+    return int(np.ceil(obj.maxk / dk)) * 2
+
+
+def drawable(conf, gal, psf_entry):
+    """
+    can gal convolved with this PSF be drawn within the FFT-size budget?
+    Decided on the unsheared, unrotated galaxy so the cut cannot depend on
+    the applied shear.
+    """
+    iconf = conf['image']
+    obj = galsim.Convolve(gal, psf_entry['obj'])
+    if psf_entry['pixel_included']:
+        size = fft_size(obj, iconf['pixel_scale'], iconf['stamp_size'])
+    else:
+        pix = galsim.Pixel(iconf['pixel_scale'])
+        size = fft_size(galsim.Convolve(obj, pix), iconf['pixel_scale'],
+                        iconf['stamp_size'])
+    return size <= iconf.get('max_fft_size', DEFAULT_MAX_FFT)
 
 
 def make_images(conf, gal, psf_entry, rng):

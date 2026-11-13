@@ -105,6 +105,10 @@ def summarize(data, gtrue, reference=None, nboot=1000, seed=7,
     keys = list(point[arms[0]].keys())
     s2n = data[arms[0] + '/s2n'][ok].ravel()
     summary = {'ngal': int(n), 'nfail': int((~ok).sum()), 'arms': {},
+               # galaxies replaced before drawing because GalSim would
+               # have needed an FFT larger than image.max_fft_size
+               'nredraw': int(data['gal_nredraw'].sum())
+               if 'gal_nredraw' in data else 0,
                's2n_quantiles': {str(q): float(np.nanquantile(s2n, q))
                                  for q in (0.05, 0.25, 0.5, 0.75, 0.95)}}
     for a in arms:
@@ -181,8 +185,9 @@ def main():
     s['config'] = conf
     with open(args.out, 'w') as f:
         json.dump(s, f, indent=1)
-    print('kept %d galaxies, %d dropped; s/n quantiles %s' % (
-        s['ngal'], s['nfail'], s['s2n_quantiles']))
+    print('kept %d galaxies, %d dropped, %d redrawn for FFT size; '
+          's/n quantiles %s' % (s['ngal'], s['nfail'], s['nredraw'],
+                                s['s2n_quantiles']))
     for a, v in s['arms'].items():
         print('%-18s m=%+.2e+-%.1e c1=%+.1e c2=%+.1e alpha=%+.3f R11=%.4f '
               'psf_frac=%.2f iter/fit=%.0f' % (

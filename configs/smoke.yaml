@@ -11,6 +11,9 @@ galaxies:
 image:
   pixel_scale: 0.055
   stamp_size: 64
+  # galaxies whose FFT would exceed this are redrawn (decided before
+  # shearing, so no shear-dependent selection)
+  max_fft_size: 4096
   noise_sigma: 3.0
 metacal:
   psf: dilate          # as in SuperBIT production
