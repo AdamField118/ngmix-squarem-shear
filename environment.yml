@@ -1,0 +1,18 @@
+name: squarem-shear
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - numba
+  - scipy
+  - galsim>=2.5
+  - fitsio
+  - pyyaml
+  - matplotlib
+  - pytest
+  - pip
+  - pip:
+      # ngmix with accelerate=True; pinned to the audited commit
+      - git+https://github.com/AdamField118/ngmix.git@f27a6ea
+      - -e .

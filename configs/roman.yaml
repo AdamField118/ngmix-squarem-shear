@@ -1,0 +1,47 @@
+# Roman H158 design PSFs (struts, central obscuration, field-dependent
+# aberrations) at random SCA positions, on a Nyquist-sampled coadd grid.
+seed: 1000
+psf:
+  source: roman
+  band: H158
+  npool: 1000
+galaxies:
+  source: cosmos
+  sample: '25.2'
+  # dir: /path/to/COSMOS_25.2_training_sample
+  # COSMOS fluxes are HST/ACS counts per second; rescale to the Roman
+  # collecting area (2.36 m vs 2.4 m) and a ~ 300 s exposure
+  flux_scale: 290.0
+image:
+  pixel_scale: 0.055
+  stamp_size: 64
+  noise_sigma: 3.0
+metacal:
+  psf: dilate          # as in SuperBIT production
+  gal_model: gauss
+  step: 0.01
+  ntry: 20
+selection:
+  # cut on the true flux (no shear-dependent selection); tune with the s/n
+  # quantiles printed by collect
+  min_true_flux: 0.0
+shear:
+  g: 0.02
+arms:
+  # reference: the same em5 model run to tight convergence, so arms differ
+  # only in how far the PSF fit has converged
+  - name: em5_converged
+    ngauss: 5
+    em: {tol: 1.0e-10, maxiter: 50000, accelerate: true}
+  # ngmix defaults
+  - name: em5_default
+    ngauss: 5
+    em: {tol: 1.0e-5, maxiter: 500}
+  # the SuperBIT production settings
+  - name: em5_superbit
+    ngauss: 5
+    em: {tol: 1.0e-6, maxiter: 50000}
+  # same tol and maxiter, accelerated
+  - name: em5_squarem
+    ngauss: 5
+    em: {tol: 1.0e-6, maxiter: 50000, accelerate: true}

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "squarem_shear"
+version = "0.1.0"
+description = "Shear-bias tests of SQUAREM-accelerated EM PSF fitting in ngmix"
+requires-python = ">=3.9"
+dependencies = ["numpy", "galsim>=2.5", "pyyaml", "ngmix"]
+
+[tool.setuptools]
+packages = ["squarem_shear"]

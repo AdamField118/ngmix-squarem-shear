@@ -1,0 +1,48 @@
+# SuperBIT PSFEx models: 50 exposures, positions drawn over each model's
+# fitted range, cycling through the files so each is used equally.
+seed: 4100
+psf:
+  source: superbit
+  files: data/psfs/superbit/*.psf
+  native_pixel_scale: 0.141   # arcsec/pixel; check against the PSFEx headers
+  npool: 1000                 # 20 positions per file
+galaxies:
+  source: cosmos
+  sample: '25.2'
+  # COSMOS fluxes are HST/ACS counts per second; (0.5 m / 2.4 m)^2 x 300 s.
+  # Tune with the s/n quantiles printed by collect.
+  flux_scale: 13.0
+image:
+  pixel_scale: 0.141
+  stamp_size: 48
+  noise_sigma: 0.5
+metacal:
+  psf: dilate          # as in SuperBIT production
+  gal_model: gauss
+  step: 0.01
+  ntry: 20
+selection:
+  # cut on the true flux (no shear-dependent selection); tune with the s/n
+  # quantiles printed by collect
+  min_true_flux: 0.0
+shear:
+  g: 0.02
+arms:
+  - name: em5_converged
+    ngauss: 5
+    em: {tol: 1.0e-10, maxiter: 50000, accelerate: true}
+  - name: em3_squarem
+    ngauss: 3
+    em: {tol: 1.0e-6, maxiter: 50000, accelerate: true}
+  - name: em5_squarem
+    ngauss: 5
+    em: {tol: 1.0e-6, maxiter: 50000, accelerate: true}
+  - name: em7_squarem
+    ngauss: 7
+    em: {tol: 1.0e-6, maxiter: 50000, accelerate: true}
+  - name: em9_squarem
+    ngauss: 9
+    em: {tol: 1.0e-6, maxiter: 50000, accelerate: true}
+  - name: em7_superbit
+    ngauss: 7
+    em: {tol: 1.0e-6, maxiter: 50000}
