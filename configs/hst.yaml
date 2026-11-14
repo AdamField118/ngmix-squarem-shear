@@ -14,7 +14,9 @@ image:
   # galaxies whose FFT would exceed this are redrawn (decided before
   # shearing, so no shear-dependent selection)
   max_fft_size: 4096
-  noise_sigma: 3.0
+  # set so the 5th-percentile s/n is ~10 (median ~20): the 50-galaxy test
+  # at noise 3.0 gave 5th-percentile/median s/n of 41/86
+  noise_sigma: 12.0
 metacal:
   psf: dilate          # as in SuperBIT production
   gal_model: gauss

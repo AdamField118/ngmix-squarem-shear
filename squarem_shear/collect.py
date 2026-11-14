@@ -19,7 +19,12 @@ Estimators (per galaxy k, averaging its four images; g is the input shear):
 A galaxy is kept only if every image succeeded in every arm, so all arms are
 evaluated on identical galaxies.  An optional cut on the *true* flux
 (`selection: {min_true_flux: ...}` in the config) removes the faintest
-objects; it cannot depend on the shear, so it adds no selection bias.
+objects, and an optional cut on the true size,
+`selection: {min_hlr_over_psf_fwhm: ...}` (or --min-size-ratio), removes
+galaxies barely larger than the PSF, whose metacal responses are extreme.
+Both use only true quantities recorded at simulation time, so they cannot
+depend on the shear and add no selection bias, and they can be changed
+without rerunning the simulations.
 """
 import argparse
 import json
@@ -77,12 +82,22 @@ def estimate(D, S, Rd, epsf, gtrue):
             'alpha': alpha}
 
 
+def psf_fwhm(data):
+    """native PSF FWHM in arcsec from its adaptive-moment T = 2 sigma^2"""
+    return 2.3548 * np.sqrt(data['psf_T'] / 2.0)
+
+
 def summarize(data, gtrue, reference=None, nboot=1000, seed=7,
-              min_true_flux=0.0):
+              min_true_flux=0.0, min_size_ratio=0.0):
     arms = arm_names(data)
     sign, rot = data['sign'], data['rot']
 
     ok = data['gal_flux'] >= min_true_flux
+    nsize = 0
+    if min_size_ratio > 0:
+        big = data['gal_hlr'] >= min_size_ratio * psf_fwhm(data)
+        nsize = int((ok & ~big).sum())
+        ok &= big
     for a in arms:
         ok &= np.all(data[a + '/flags'] == 0, axis=1)
     epsf = data['psf_e'][ok]
@@ -109,6 +124,7 @@ def summarize(data, gtrue, reference=None, nboot=1000, seed=7,
                # have needed an FFT larger than image.max_fft_size
                'nredraw': int(data['gal_nredraw'].sum())
                if 'gal_nredraw' in data else 0,
+               'nsizecut': nsize, 'min_size_ratio': min_size_ratio,
                's2n_quantiles': {str(q): float(np.nanquantile(s2n, q))
                                  for q in (0.05, 0.25, 0.5, 0.75, 0.95)}}
     for a in arms:
@@ -173,6 +189,9 @@ def main():
     p.add_argument('--out', required=True)
     p.add_argument('--reference', default=None)
     p.add_argument('--nboot', type=int, default=1000)
+    p.add_argument('--min-size-ratio', type=float, default=None,
+                   help='keep galaxies with true hlr >= this x PSF FWHM; '
+                        'overrides selection.min_hlr_over_psf_fwhm')
     args = p.parse_args()
 
     data = load(args.files)
@@ -181,13 +200,17 @@ def main():
     sel = conf.get('selection', {})
     s = summarize(data, conf['shear']['g'], reference=args.reference,
                   nboot=args.nboot,
-                  min_true_flux=sel.get('min_true_flux', 0.0))
+                  min_true_flux=sel.get('min_true_flux', 0.0),
+                  min_size_ratio=(args.min_size_ratio
+                                  if args.min_size_ratio is not None
+                                  else sel.get('min_hlr_over_psf_fwhm', 0.0)))
     s['config'] = conf
     with open(args.out, 'w') as f:
         json.dump(s, f, indent=1)
-    print('kept %d galaxies, %d dropped, %d redrawn for FFT size; '
-          's/n quantiles %s' % (s['ngal'], s['nfail'], s['nredraw'],
-                                s['s2n_quantiles']))
+    print('kept %d galaxies, %d dropped (%d by the size cut), %d redrawn '
+          'for FFT size; s/n quantiles %s' % (
+              s['ngal'], s['nfail'], s['nsizecut'], s['nredraw'],
+              s['s2n_quantiles']))
     for a, v in s['arms'].items():
         print('%-18s m=%+.2e+-%.1e c1=%+.1e c2=%+.1e alpha=%+.3f R11=%.4f '
               'psf_frac=%.2f iter/fit=%.0f' % (
