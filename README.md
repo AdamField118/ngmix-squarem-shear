@@ -77,16 +77,21 @@ python -m squarem_shear.run configs/smoke.yaml --chunk 0 --nobj 10 --out results
 python -m squarem_shear.collect results/smoke/chunk*.npz --out results/smoke/summary.json --reference em5_converged
 ```
 
-Then the full runs. Each line of `scripts/run_all.sh` is one SLURM array
-of 150 × 200 = **30,000 galaxies (120,000 images) per PSF source**:
+Then the full runs: **30,000 galaxies (120,000 images) per PSF source**, as
+150 chunks of 200. Each line of `scripts/run_all.sh` submits one SLURM
+array. Each array task runs several chunks in turn, which keeps the job count
+under per-user submit limits:
 
 ```bash
-scripts/run_all.sh
+scripts/run_all.sh                       # 85 jobs in all; edit to suit
+EXTRA=--partition=long scripts/run_all.sh
+scripts/submit.sh configs/hst.yaml 50 16 # or one configuration at a time
 scripts/collect_all.sh
 ```
 
-A chunk is skipped if its output already exists, so failed array tasks can
-simply be resubmitted. Chunk *c*, object *i* uses seed
+`scripts/submit.sh` prints the commands for finding your cluster's job and
+time limits. A chunk is skipped if its output already exists, so a failed or
+timed-out task can simply be resubmitted with the same command. Chunk *c*, object *i* uses seed
 `seed + 1_000_000*c + i`, so any single object can be regenerated on its own.
 
 **Before the production runs, tune each config's `noise_sigma`, `flux_scale`
